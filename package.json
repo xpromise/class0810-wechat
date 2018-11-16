@@ -1,0 +1,23 @@
+{
+  "name": "class0810-wechat",
+  "version": "1.0.0",
+  "description": "* 本地有仓库，远程没有仓库\r   * 远程创建仓库\r   * 本地进行版本控制\r     * git init\r     * git add .\r     * git commit -m 'xxx'\r   * 将本地仓库和远程仓库关联起来\r     * git remote add origin xxx\r * 本地没有仓库，远程有仓库\r   * 获取远程仓库地址，克隆到本地来\r     * git clone xxx\r   * 假设远程只有master分支，新建dev分支开发\r     * git checkout -b dev 新建并切换到指定分支，将当前分支的内容复制到dev上\r   * dev分支开发完了(常用)\r     * 本地仓库管理\r       * git add .\r       * git commit -m 'xxx'\r     * 提交远程仓库去\r       * git push origin dev\r     * 切换分支\r       * git checkout master\r * 需要合并分支内容\r   * git checkout master\r   * git merge dev\r   * git push origin master\r * 本地没有仓库，远程有仓库, 并且远程有dev分支内容\r   * 将远程仓库克隆到本地来\r     * git clone xxx\r   * 问题：只有一个分支。想要其它分支的内容\r     * git fetch origin dev:dev",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xpromise/class0810-wechat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xpromise/class0810-wechat/issues"
+  },
+  "homepage": "https://github.com/xpromise/class0810-wechat#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "sha1": "^1.1.1"
+  }
+}
