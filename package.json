@@ -18,6 +18,7 @@
   "homepage": "https://github.com/xpromise/class0810-wechat#readme",
   "dependencies": {
     "express": "^4.16.4",
-    "sha1": "^1.1.1"
+    "sha1": "^1.1.1",
+    "xml2js": "^0.4.19"
   }
 }
