@@ -2,7 +2,6 @@
   设置最终回复给微信服务器的消息模板
  */
 
-
 module.exports = options => {
   //返回xml消息给微信服务器
   let replyMessage = `<xml>
@@ -10,7 +9,6 @@ module.exports = options => {
       <FromUserName><![CDATA[${options.fromUserName}]]></FromUserName>
       <CreateTime>${options.createTime}</CreateTime>
       <MsgType><![CDATA[${options.msgType}]]></MsgType>`;
-//微信官网提供的xml数据有问题，有多余的空格，要手动去除，不去除会报错
   
   if (options.msgType === 'text') {
     replyMessage += `<Content><![CDATA[${options.content}]]></Content>`;

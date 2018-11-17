@@ -2,6 +2,7 @@ const express = require('express');
 const sha1 = require('sha1');
 
 const {getUserDataAsync, parseXMLDataAsync, formatMessage} = require('./utils/tools');
+const reply = require('./reply/reply');
 const template = require('./reply/template');
 
 const app = express();
@@ -95,34 +96,7 @@ app.use(async (req, res, next) => {
       Content: '333',
       MsgId: '6624370391693488478' }
      */
-    //初始化消息配置对象
-    let options = {
-      toUserName: message.FromUserName,
-      fromUserName: message.ToUserName,
-      createTime: Date.now(),
-      msgType: 'text'
-    }
-    
-    //初始化一个消息文本
-    let content = '你在说什么，我听不懂~';
-    
-    //判断用户发送消息的内容，根据内容返回特定的响应
-    if (message.Content === '1') {  //全匹配
-      content = '大吉大利，今晚吃鸡';
-    } else if (message.Content === '2') {
-      content = '落地成盒';
-    } else if (message.Content.includes('爱')) {  //半匹配
-      content = '我爱你~';
-    } else if (message.Content === '3') {
-      //回复图文消息
-      options.msgType = 'news';
-      options.title = '微信公众号开发~';
-      options.description = 'class0810~';
-      options.picUrl = 'https://ss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=199783060,2774173244&fm=58&s=188FA15AB1206D1108400056000040F6&bpow=121&bpoh=75';
-      options.url = 'http://www.atguigu.com';
-    }
-  
-    options.content = content;
+    const options = reply(message);
   
     const replyMessage = template(options);
     console.log(replyMessage);
