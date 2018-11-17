@@ -138,8 +138,8 @@ class Wechat {
         }
       })
       .catch(async err => {
-        const accessToken = await w.getAccessToken();
-        await w.saveAccessToken('./accessToken.txt', accessToken);
+        const accessToken = await this.getAccessToken();
+        await this.saveAccessToken('./accessToken.txt', accessToken);
         return accessToken;
       })
       .then(res => {
@@ -150,6 +150,45 @@ class Wechat {
         return Promise.resolve(res);
       })
       
+  }
+  
+  /**
+   * 创建自定义菜单
+   * @param menu
+   * @return {Promise<*>}
+   */
+  async createMenu (menu) {
+    try {
+      //获取access_token
+      const {access_token} = await this.fetchAccessToken();
+      //定义请求地址
+      const url = `https://api.weixin.qq.com/cgi-bin/menu/create?access_token=${access_token}`;
+      //发送请求
+      const result = await rp({method: 'POST', url, json: true, body: menu});
+  
+      return result;
+    } catch (e) {
+      return 'createMenu方法出了问题：' + e;
+    }
+  }
+  
+  /**
+   * 删除菜单
+   * @return {Promise<*>}
+   */
+  async deleteMenu () {
+    try {
+      //获取access_token
+      const {access_token} = await this.fetchAccessToken();
+      //定义请求地址
+      const url = `https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=${access_token}`;
+      //发送请求
+      const result = await rp({method: 'GET', url, json: true});
+  
+      return result;
+    } catch (e) {
+      return 'deleteMenu方法出了问题：' + e;
+    }
   }
   
 }
@@ -166,9 +205,9 @@ class Wechat {
    */
   const w = new Wechat();
   
-  let result = await w.fetchAccessToken();
+  let result = await w.deleteMenu();
   console.log(result);
-  result = await w.fetchAccessToken();
+  result = await w.createMenu(require('./menu'));
   console.log(result);
 
 })()
