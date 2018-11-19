@@ -231,31 +231,44 @@ class Wechat {
       return 'batchUsersTag方法出了问题' + e;
     }
   }
+  
+  /**
+   * 根据标签群发消息
+   * @param options
+   * @return {Promise<*>}
+   */
+  async sendAllByTag (options) {
+    try {
+      const {access_token} = await this.fetchAccessToken();
+      const url = `${api.message.sendall}access_token=${access_token}`;
+      return await rp({method: 'POST', url, json: true, body: options});
+    } catch (e) {
+      return 'sendAllByTag方法出了问题' + e;
+    }
+  }
+  
+  
 }
 
+//测试微信接口功能
 (async () => {
-  /*
-  读取本地保存access_token（readAccessToken）
-      - 有
-        - 判断是否过期（isValidAccessToken）
-          - 过期了, 重新发送请求，获取access_token（getAccessToken），保存下来（覆盖之前的）(saveAccessToken)
-          - 没有过期, 直接使用
-      - 没有
-        - 发送请求，获取access_token，保存下来
-   */
   const w = new Wechat();
   
-  let result1 = await w.createTag('class0810');
-  console.log(result1); // { tag: { id: 131, name: 'class0810' } }
-  let result2 = await w.batchUsersTag([
-    'oAsoR1rnW1QrtFPSqsClTTl2stE0',
-    'oAsoR1ktRa8MGiuxEC5RphecPXKs',
-    'oAsoR1sBFZ1uvG4Qt64IbhDZLZFU',
-    'oAsoR1kvRB5hCjHOKCsNpb78aeyE',
-    'oAsoR1iP-_D3LZIwNCnK8BFotmJc'
-  ], result1.tag.id);
-  console.log(result2);
-  let result3 = await w.getTagUsers(result1.tag.id);
-  console.log(result3);
+  let result = await w.sendAllByTag({
+    "filter":{
+      "is_to_all":false,
+      "tag_id": 131
+    },
+    "text":{
+      "content": "今天天气真晴朗~"
+    },
+    "msgtype":"text"
+  });
+  console.log(result);
+  /*
+  { errcode: 0,
+  errmsg: 'send job submission success',
+  msg_id: 1000000011 }
+   */
 
 })()

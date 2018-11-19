@@ -36,7 +36,7 @@
         - 发送请求，获取access_token，保存下来
  */
 const rp = require('request-promise-native');
-const {writeFile, readFile} = require('fs');
+const {writeFile, readFile, createReadStream} = require('fs');
 const {appID, appsecret} = require('../config');
 const api = require('../api');
 
@@ -231,31 +231,128 @@ class Wechat {
       return 'batchUsersTag方法出了问题' + e;
     }
   }
+  
+  /**
+   * 根据标签群发消息
+   * @param options
+   * @return {Promise<*>}
+   */
+  async sendAllByTag (options) {
+    try {
+      const {access_token} = await this.fetchAccessToken();
+      const url = `${api.message.sendall}access_token=${access_token}`;
+      return await rp({method: 'POST', url, json: true, body: options});
+    } catch (e) {
+      return 'sendAllByTag方法出了问题' + e;
+    }
+  }
+  
+  async uploadMaterial (type, material, body) {
+    try {
+      //获取access_token
+      const {access_token} = await this.fetchAccessToken();
+      //定义请求地址
+      let url = '';
+      let options = {method: 'POST', json: true};
+      
+      if (type === 'news') {
+        url = `${api.upload.uploadNews}access_token=${access_token}`;
+        //请求体参数
+        options.body = material;
+      } else if (type === 'pic') {
+        url = `${api.upload.uploadimg}access_token=${access_token}`;
+        //以form表单上传
+        options.formData = {
+          media: createReadStream(material)
+        }
+      } else {
+        url = `${api.upload.uploadOthers}access_token=${access_token}&type=${type}`;
+        //以form表单上传
+        options.formData = {
+          media: createReadStream(material)
+        }
+        
+        if (type === 'video') {
+          options.body = body;
+        }
+        
+      }
+  
+      options.url = url;
+      
+      //发送请求
+      return await rp(options);
+      
+    } catch (e) {
+      return 'uploadMaterial方法出了问题' + e;
+    }
+    
+  }
+  
+  
 }
 
+//测试微信接口功能
 (async () => {
-  /*
-  读取本地保存access_token（readAccessToken）
-      - 有
-        - 判断是否过期（isValidAccessToken）
-          - 过期了, 重新发送请求，获取access_token（getAccessToken），保存下来（覆盖之前的）(saveAccessToken)
-          - 没有过期, 直接使用
-      - 没有
-        - 发送请求，获取access_token，保存下来
-   */
   const w = new Wechat();
   
-  let result1 = await w.createTag('class0810');
-  console.log(result1); // { tag: { id: 131, name: 'class0810' } }
-  let result2 = await w.batchUsersTag([
-    'oAsoR1rnW1QrtFPSqsClTTl2stE0',
-    'oAsoR1ktRa8MGiuxEC5RphecPXKs',
-    'oAsoR1sBFZ1uvG4Qt64IbhDZLZFU',
-    'oAsoR1kvRB5hCjHOKCsNpb78aeyE',
-    'oAsoR1iP-_D3LZIwNCnK8BFotmJc'
-  ], result1.tag.id);
+  /*//上传图片获取media_id
+  let result1 = await w.uploadMaterial('image', './node.jpg');
+  console.log(result1);
+  /!*
+  { media_id: '1_821D3VHxMTbMuZ5-DSoMdegIBNCcnH8CbuuCWBZrw',
+  url: 'http://mmbiz.qpic.cn/mmbiz_png/l6hEPf9t1fELREZNkCURLv7u5SZf4R1CotvXyq08AWrfkVyr60Qc7hYhIuYzFkBsWdCetdS0icuft3Vic0NWYRAw/0?wx_fmt=png
+   *!/
+    //上传图片获取地址
+  let result2 = await w.uploadMaterial('pic', './logo.png');
   console.log(result2);
-  let result3 = await w.getTagUsers(result1.tag.id);
+  /!*
+  { url: 'http://mmbiz.qpic.cn/mmbiz_png/l6hEPf9t1fELREZNkCURLv7u5SZf4R1Cib5tbQCCx8ic3qMOl3pHaianpyrgqRlQZmt2GH3ZVR4OpRjXrS6pEpXhA/0' }
+   *!/
+  //上传图文消息
+  let result3 = await w.uploadMaterial('news', {
+    "articles": [{
+      "title": '微信公众号开发',
+      "thumb_media_id": result1.media_id,
+      "author": '佚名',
+      "digest": '这里是class0810开发的',
+      "show_cover_pic": 1,
+      "content": `<!DOCTYPE html>
+                  <html lang="en">
+                  <head>
+                    <meta charset="UTF-8">
+                    <title>Title</title>
+                  </head>
+                  <body>
+                    <h1>微信公众号开发</h1>
+                    <img src="${result2.url}">
+                  </body>
+                  </html>`,
+      "content_source_url": 'http://www.atguigu.com',
+      "need_open_comment":1,
+      "only_fans_can_comment":1
+    },
+      {
+        "title": 'class0810',
+        "thumb_media_id": result1.media_id,
+        "author": '佚名',
+        "digest": '课程学了一大半了~马上要毕业了',
+        "show_cover_pic": 0,
+        "content": '今天天气真晴朗',
+        "content_source_url": 'https://www.baidu.com',
+        "need_open_comment":0,
+        "only_fans_can_comment":0
+      }
+    ]
+  });
   console.log(result3);
-
+  /!*
+  { media_id: '1_821D3VHxMTbMuZ5-DSoIWBsxL-yM3hCmIuKS430HQ' }
+   *!/*/
+  
+  //删除菜单，再重新创建
+  let result = await w.deleteMenu();
+  console.log(result);
+  result = await w.createMenu(require('./menu'));
+  console.log(result);
 })()
