@@ -57,3 +57,19 @@
     * 判断message.Content的内容，做出相应的回应
     * 微信要求回复消息内容也必须是xml数据格式
     
+## 完成了完整回复
+* 对用户发送的消息进行类型判断
+  * reply
+  * 决定最终回复消息的内容 options
+* 回复用户6种消息模板
+    
+## 获取access_token
+* 全局接口的唯一调用凭据
+* 实现思路
+  读取本地保存access_token（readAccessToken）
+    - 有
+      - 判断是否过期（isValidAccessToken）
+        - 过期了, 重新发送请求，获取access_token（getAccessToken），保存下来（覆盖之前的）(saveAccessToken)
+        - 没有过期, 直接使用
+    - 没有
+      - 发送请求，获取access_token，保存下来
