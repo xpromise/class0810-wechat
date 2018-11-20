@@ -48,7 +48,6 @@ app.get('/search', async (req, res) => {
     `timestamp=${timestamp}`,
     `url=${url}/search`
   ]
-  
   //排序，以&拼接成一个字符串, 再进行sha1加密，得到的就是加密签名
   const signature = sha1(arr.sort().join('&'));
   

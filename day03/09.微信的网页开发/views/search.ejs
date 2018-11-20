@@ -8,6 +8,7 @@
 <body>
   <h2>语音识别功能</h2>
   <button id="btn">点击开始录音</button>
+  <ul id="list"></ul>
   <script type="text/javascript" src="https://cdn.bootcss.com/zepto/1.0rc1/zepto.min.js"></script>
   <script type="text/javascript" src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
   <script type="text/javascript">
@@ -61,7 +62,43 @@
                   localId: localId, // 需要识别的音频的本地Id，由录音相关接口获得
                   isShowProgressTips: 1, // 默认为1，显示进度提示
                   success: function (res) {
-                    alert(res.translateResult); // 语音识别的结果
+                    // alert(res.translateResult); // 语音识别的结果
+                    //定义请求地址
+                    const url = `http://api.douban.com/v2/movie/search?count=9&callback=?&q=${res.translateResult}`;
+                    console.log(url);
+                    //发送jsonp的跨域请求
+                    //Zepto 将自动替换 ? 为正确的函数名，以执行回调函数
+                    $.getJSON(url, function ({subjects}) {
+                      // console.log(data);
+                      let html = '';
+                      subjects.forEach(function (item, index) {
+                        html += `<li><h3>${item.title}</h3><img src="${item.images.small}"><p>电影评分：${item.rating.average}</p></li>`
+                      })
+                      $('#list').html(html);
+
+                      //分享功能， 默认分享第一个电影数据
+                      wx.updateAppMessageShareData({
+                        title: subjects[0].title, // 分享标题
+                        desc: `电影评分：${subjects[0].rating.average}`, // 分享描述
+                        link: subjects[0].alt, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                        imgUrl: subjects[0].images.small, // 分享图标
+                        success: function () {
+                          // 设置成功
+                          alert('请点击右上角三点开始分享到朋友或者qq好友');
+                        }
+                      })
+
+                      wx.updateTimelineShareData({
+                        title: subjects[0].title, // 分享标题
+                        link: subjects[0].alt, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                        imgUrl: subjects[0].images.small, // 分享图标
+                        success: function () {
+                          // 设置成功
+                          alert('请点击右上角三点开始分享到朋友圈或者qq空间');
+                        }
+                      })
+
+                    })
                   }
                 });
 

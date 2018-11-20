@@ -23,5 +23,8 @@
     "request-promise-native": "^1.0.5",
     "sha1": "^1.1.1",
     "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "puppeteer": "1.7.0"
   }
 }
