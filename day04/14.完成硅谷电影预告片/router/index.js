@@ -46,7 +46,7 @@ router.get('/movie', async (req, res) => {
   //去数据库中找到所有数据
   const movies = await Trailers.find({}, {_id: 0, __v: 0, image: 0, src: 0, cover: 0})
   
-  res.render('movie', {movies});
+  res.render('movie', {movies, url});
 })
 
 
